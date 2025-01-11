@@ -101,6 +101,8 @@ class ChatFactory(protocol.Factory):
 
         else:
             self.userAuth = {}
+            if not os.path.exists("data"):
+                os.mkdir("data")
             with open("data/authentication.json", "w") as authFile:
                 authFile.write("{}")
 
