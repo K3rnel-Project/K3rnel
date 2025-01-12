@@ -45,6 +45,14 @@ class ChatProtocol(LineReceiver):
 
                 # Assign username to this client
                 peer = self.transport.getPeer()
+
+                if self.clients[peer]["authenticated"]:
+                    self.sendLine(json.dumps({"type": "connRefused",
+                                              "reason": "You are already authenticated. Stop hacking."}).encode(
+                        'utf-8'))
+                    self.transport.loseConnection()
+                    return
+
                 self.clients[peer]["username"] = username
 
                 print(f"Client set username: {username}")
