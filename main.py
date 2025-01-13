@@ -25,7 +25,7 @@ class ChatProtocol(LineReceiver):
             del self.clients[peer]
 
     def lineReceived(self, line):
-        # TODO: Add the actual messaging functionality
+        # TODO: Add the actual messaging functionality - format: {"type": "sendMessage", "to": "username", "publicKey": "<public key of sender>"} - no "from" field to prevent sending messages on behalf of others
         print(f"Received: {line}")
         try:
             jsonData = json.loads(line.decode('utf-8'))
