@@ -25,6 +25,7 @@ class ChatProtocol(LineReceiver):
             del self.clients[peer]
 
     def lineReceived(self, line):
+        # TODO: Add friending functionality
         # TODO: Add the actual messaging functionality - format: {"type": "sendMessage", "to": "username", "publicKey": "<public key of sender>"} - no "from" field to prevent sending messages on behalf of others
         print(f"Received: {line}")
         try:
@@ -93,6 +94,20 @@ class ChatProtocol(LineReceiver):
 
                 self.clients[peer]["authenticated"] = True
                 print(f"Client with username {username} has been authenticated!")
+            if jsonData["type"] == "friendRequest":
+                peer = self.transport.getPeer()
+
+                if not self.clients[peer]["authenticated"]:
+                    self.sendLine(json.dumps({"type": "connRefused",
+                                              "reason": "You are not authenticated yet."}).encode(
+                        'utf-8'))
+                    self.transport.loseConnection()
+                    return
+
+                username = self.clients[peer]["username"]
+                to = jsonData["to"]
+                # TODO: Check if the user to send the request to is on the server, if yes, send a message with a friend request and add to the JSON file, if no, add to the JSON file.
+                # TODO: When a user logs in, send them the JSON of all friend requests.
         except ValueError:
             self.sendLine(json.dumps({"type": "connRefused", "reason": "Some arguments are missing"}).encode('utf-8'))
             self.transport.loseConnection()
@@ -106,6 +121,7 @@ class ChatFactory(protocol.Factory):
         if os.path.exists("data/authentication.json"):
             with open("data/authentication.json", "r") as authFile:
                 self.userAuth = json.loads(authFile.read())
+        # TODO: Add a "Friends" JSON file (e.g. 'data/friends.json')
 
         else:
             self.userAuth = {}
