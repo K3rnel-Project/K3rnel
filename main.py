@@ -8,9 +8,10 @@ import os
 
 
 class ChatProtocol(LineReceiver):
-    def __init__(self, clients: dict, user_auth: dict):
+    def __init__(self, clients: dict, auth: dict, friends: dict):
         self.clients = clients
-        self.userAuth = user_auth
+        self.userAuth = auth
+        self.friends = friends
 
     def connectionMade(self):
         peer = self.transport.getPeer()
@@ -116,13 +117,13 @@ class ChatProtocol(LineReceiver):
 
 class ChatFactory(protocol.Factory):
     def __init__(self):
-        # This will hold references to all the connected clients
+        # This holds references to all the connected clients
         self.clients = {}
+
+        # This holds all the user authentication data
         if os.path.exists("data/authentication.json"):
             with open("data/authentication.json", "r") as authFile:
                 self.userAuth = json.loads(authFile.read())
-        # TODO: Add a "Friends" JSON file (e.g. 'data/friends.json')
-
         else:
             self.userAuth = {}
             if not os.path.exists("data"):
@@ -130,10 +131,21 @@ class ChatFactory(protocol.Factory):
             with open("data/authentication.json", "w") as authFile:
                 authFile.write("{}")
 
+        # This holds the friends of all the users
+        if os.path.exists("data/friends.json"):
+            with open("data/friends.json", "r") as friendsFile:
+                self.friends = json.loads(authFile.read())
+        else:
+            self.friends = {}
+            if not os.path.exists("data"):
+                os.mkdir("data")
+            with open("data/friends.json", "w") as friendsFile:
+                friendsFile.write("{}")
+
     def buildProtocol(self, addr):
         # This method is called for every new connection
         # It returns an instance of ChatProtocol
-        return ChatProtocol(self.clients, self.userAuth)
+        return ChatProtocol(self.clients, self.userAuth, self.friends)
 
 
 def main():
