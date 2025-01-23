@@ -1,3 +1,5 @@
+# K3rnel - a decentralized chat communication network/protocol
+# Developed by Arslaan Pathan - xminecrafterfun@gmail.com
 from twisted.internet import ssl, reactor
 from twisted.protocols.basic import LineReceiver
 from twisted.internet import protocol
